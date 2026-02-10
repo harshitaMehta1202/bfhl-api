@@ -1,10 +1,31 @@
 const express = require("express");
-const app = express();
+const axios = require("axios");
 
+const app = express();
 app.use(express.json());
 
 const EMAIL = "harshita1236.be23@chitkarauniversity.edu.in";
+const GEMINI_KEY = process.env.GEMINI_KEY;
 
+
+async function askAI(question) {
+  const response = await axios.post(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_KEY}`,
+    {
+      contents: [
+        {
+          parts: [
+            {
+              text: `Answer in ONE WORD only. No explanation. Question: ${question}`
+            }
+          ]
+        }
+      ]
+    }
+  );
+
+  return response.data.candidates[0].content.parts[0].text.trim();
+}
 
 app.get("/health", (req, res) => {
   res.json({
@@ -14,7 +35,7 @@ app.get("/health", (req, res) => {
 });
 
 
-app.post("/bfhl", (req, res) => {
+app.post("/bfhl", async (req, res) => {
   const body = req.body;
   let result;
 
@@ -49,25 +70,7 @@ app.post("/bfhl", (req, res) => {
   }
 
   else if (body.AI) {
-   async function askAI(question) {
-  const response = await axios.post(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_KEY}`,
-    {
-      contents: [
-        {
-          parts: [
-            {
-              text: `Answer in ONE WORD only. No explanation. Question: ${question}`
-            }
-          ]
-        }
-      ]
-    }
-  );
-
-  return response.data.candidates[0].content.parts[0].text.trim();
-}
-
+    result = await askAI(body.AI);
   }
 
   else {
