@@ -69,25 +69,17 @@ app.post("/bfhl", async (req, res) => {
     result = body.hcf.reduce(gcd);
   }
 
-  else if (body.AI) {
+ else if (body.AI) {
+  try {
     result = await askAI(body.AI);
+  } catch (err) {
+    console.error(err.message);
+    result = "Error";
   }
+}
 
-  else {
-    return res.status(400).json({
-      is_success: false,
-      official_email: EMAIL,
-      data: "Invalid input"
-    });
-  }
+const PORT = process.env.PORT || 3000;
 
-  res.json({
-    is_success: true,
-    official_email: EMAIL,
-    data: result
-  });
-});
-
-app.listen(3000, () => {
-  console.log("Server running on port 3000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
