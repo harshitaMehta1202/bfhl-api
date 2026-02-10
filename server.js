@@ -49,7 +49,25 @@ app.post("/bfhl", (req, res) => {
   }
 
   else if (body.AI) {
-    result = "Mumbai"; 
+   async function askAI(question) {
+  const response = await axios.post(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_KEY}`,
+    {
+      contents: [
+        {
+          parts: [
+            {
+              text: `Answer in ONE WORD only. No explanation. Question: ${question}`
+            }
+          ]
+        }
+      ]
+    }
+  );
+
+  return response.data.candidates[0].content.parts[0].text.trim();
+}
+
   }
 
   else {
